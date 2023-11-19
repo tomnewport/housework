@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
   build-and-push-docker:
@@ -53,9 +55,9 @@ jobs:
         name: build-directory
         path: housework-app/build/
 
-  deploy:
+  deploy-development:
     runs-on: ubuntu-latest
-
+    environment: development
     needs:
     - build-and-push-docker
     - build-cra-app

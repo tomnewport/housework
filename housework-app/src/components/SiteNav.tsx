@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -15,14 +14,11 @@ import {
   Toolbar,
   Typography,
   useTheme,
-  IconButton,
 } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SearchIcon from "@mui/icons-material/Search";
-import StarBorder from "@mui/icons-material/StarBorder";
-import { BusAlertTwoTone, Notifications } from "@mui/icons-material";
 import NotificationMenu from "./notification/NotificationMenu";
 import MyTeamsList from "./team/MyTeamsList";
 import { useIsLandscape } from "../utils/useIsLandscape";
@@ -46,15 +42,17 @@ interface NavigationItemProps {
 
 const menuItems: MenuItem[] = [
   { name: "My Jobs", url: "/jobs", Icon: AssignmentIcon },
-  { name: "Teams", url: "/teams", Icon: Diversity3Icon, children: <MyTeamsList /> },
+  {
+    name: "Teams",
+    url: "/teams",
+    Icon: Diversity3Icon,
+    children: <MyTeamsList />,
+  },
   { name: "Profile", url: "/profile", Icon: AccountCircleIcon },
   { name: "Search", url: "/search", Icon: SearchIcon },
 ];
 
-const NavigationItem: React.FC<NavigationItemProps> = ({
-  item,
-  path,
-}) => {
+const NavigationItem: React.FC<NavigationItemProps> = ({ item, path }) => {
   const navigate = useNavigate();
   const isSelected = `/${path[0]}` === item.url;
 
@@ -67,17 +65,17 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
         <ListItemText primary={item.name} />
       </ListItemButton>
       <Collapse in={isSelected} timeout="auto" unmountOnExit>
-      {item.children || null}
+        {item.children || null}
       </Collapse>
-      
     </>
   );
 };
 
 const SiteNavPortrait: React.FC<SiteNavProps> = ({ children, path }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const currentPathIndex = menuItems.findIndex((item) => item.url === `/${path[0]}`);
+  const currentPathIndex = menuItems.findIndex(
+    (item) => item.url === `/${path[0]}`,
+  );
 
   return (
     <Box sx={{ pb: 7 }}>
@@ -89,9 +87,7 @@ const SiteNavPortrait: React.FC<SiteNavProps> = ({ children, path }) => {
           <NotificationMenu />
         </Toolbar>
       </AppBar>
-      <Box sx={{ position: 'relative '}}>
-      {children}
-      </Box>
+      <Box sx={{ position: "relative " }}>{children}</Box>
       <Paper
         sx={{ zIndex: 1, position: "fixed", bottom: 0, left: 0, right: 0 }}
         elevation={3}
@@ -150,9 +146,7 @@ const SiteNavLandscape: React.FC<SiteNavProps> = ({ children, path }) => {
           ))}
         </List>
       </Drawer>
-      <Box sx={{ position: 'relative '}}>
-      {children}
-      </Box>
+      <Box sx={{ position: "relative " }}>{children}</Box>
     </Box>
   );
 };

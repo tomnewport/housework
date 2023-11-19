@@ -16,15 +16,14 @@ interface LoginFormProps {
 export default function LoginForm({ open, onClose }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginUser, { isLoading }] = useLoginUserMutation();
+  const [loginUser] = useLoginUserMutation();
 
   const handleLogin = async () => {
     // Handle the login logic
     loginUser({ username, password });
   };
   return (
-    <Dialog fullWidth={true}
-    maxWidth="sm" open={open} onClose={onClose}>
+    <Dialog fullWidth={true} maxWidth="sm" open={open} onClose={onClose}>
       <DialogTitle>Login</DialogTitle>
       <DialogContent>
         <TextField

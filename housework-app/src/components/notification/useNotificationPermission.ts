@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const useNotificationPermission = () => {
   const [permission, setPermission] = useState(Notification.permission);
@@ -9,15 +9,19 @@ const useNotificationPermission = () => {
     };
 
     // Event listener for permission changes
-    navigator.permissions.query({name: 'notifications'}).then((notificationPerm) => {
-      notificationPerm.onchange = handlePermissionChange;
-    });
+    navigator.permissions
+      .query({ name: "notifications" })
+      .then((notificationPerm) => {
+        notificationPerm.onchange = handlePermissionChange;
+      });
 
     // Cleanup function to remove event listener
     return () => {
-      navigator.permissions.query({name: 'notifications'}).then((notificationPerm) => {
-        notificationPerm.onchange = null;
-      });
+      navigator.permissions
+        .query({ name: "notifications" })
+        .then((notificationPerm) => {
+          notificationPerm.onchange = null;
+        });
     };
   }, []);
 

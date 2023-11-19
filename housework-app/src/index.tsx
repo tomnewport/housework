@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./theme";
 
-navigator.serviceWorker.register('/service-worker.js');
+navigator.serviceWorker.register("/service-worker.js");
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,

@@ -1,9 +1,12 @@
 import apiService from "./index";
-import { paths } from './schema';
+import { paths } from "./schema";
 
-type GetTeamsResponse = paths["/api/v1/teams/"]["get"]["responses"]["200"]["content"]["application/json"];
-type GetInvitationsResponse = paths["/api/v1/teams/invitations"]["get"]["responses"]["200"]["content"]["application/json"];
-type RespondInvitationRequest = paths["/api/v1/teams/invitations/{invitation_id}/{action}"]["post"]["parameters"]["path"];
+type GetTeamsResponse =
+  paths["/api/v1/teams/"]["get"]["responses"]["200"]["content"]["application/json"];
+type GetInvitationsResponse =
+  paths["/api/v1/teams/invitations"]["get"]["responses"]["200"]["content"]["application/json"];
+type RespondInvitationRequest =
+  paths["/api/v1/teams/invitations/{invitation_id}/{action}"]["post"]["parameters"]["path"];
 
 export const extendedApiService = apiService.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,4 +28,8 @@ export const extendedApiService = apiService.injectEndpoints({
   }),
 });
 
-export const { useRespondInvitationMutation, useGetInvitationsQuery, useGetTeamsQuery } = extendedApiService;
+export const {
+  useRespondInvitationMutation,
+  useGetInvitationsQuery,
+  useGetTeamsQuery,
+} = extendedApiService;

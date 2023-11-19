@@ -1,14 +1,5 @@
 import {
-  Button,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
-  Skeleton,
 } from "@mui/material";
 import { GetJobByIDResponse } from "../../services/housework/jobs";
 import { Stars } from "@mui/icons-material";

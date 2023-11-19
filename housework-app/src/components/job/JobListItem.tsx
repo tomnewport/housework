@@ -2,15 +2,13 @@ import {
   Box,
   Divider,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   Typography,
 } from "@mui/material";
 import { Job } from "../../services/housework/types";
-import EventIcon from "@mui/icons-material/Event";
 import { DateTime } from "luxon";
 import { useGetTeamsQuery } from "../../services/housework/teams";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface JobListItemProps {
   job: Job;
@@ -44,8 +42,7 @@ export default function JobListItem({ job }: JobListItemProps) {
 
   const dueText = formatDate(job.due_date);
   const { data: teamsData = [] } = useGetTeamsQuery(undefined);
-  const teamName = teamsData.find((team) => team.id == job.team)
-    ?.name;
+  const teamName = teamsData.find((team) => team.id === job.team)?.name;
 
   return (
     <>

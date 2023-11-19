@@ -5,7 +5,6 @@ import {
   Collapse,
   Dialog,
   DialogContent,
-  DialogTitle,
   IconButton,
   List,
   ListItem,
@@ -22,10 +21,6 @@ import {
   ArrowBack,
   Check,
   Edit,
-  HelpOutline,
-  Info,
-  InfoOutlined,
-  SkipNext,
 } from "@mui/icons-material";
 import {
   GetJobByIDResponse,
@@ -35,7 +30,6 @@ import { useState } from "react";
 import { useShouldFullscreen } from "../../utils/mediaQuery";
 import JobDelayWidget from "./JobDelayWidget";
 import { TransitionGroup } from "react-transition-group";
-import { red } from "@mui/material/colors";
 
 interface JobCompleteDialogProps {
   open: boolean;
@@ -53,22 +47,24 @@ const colours = [
   [181, 135, 63],
   [181, 96, 63],
   [181, 63, 140],
-]
+];
 
 function getColour(idx: number, alpha: number): string {
-  while (idx < 0) { idx += colours.length }
+  while (idx < 0) {
+    idx += colours.length;
+  }
   const [r, g, b] = colours[idx % colours.length];
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 interface ColouredVariant {
-  id: number | null,
-  credit: number,
-  idx: number,
-  colour: string,
-  hoverColour: string,
-  name: string,
-  description: string,
+  id: number | null;
+  credit: number;
+  idx: number;
+  colour: string;
+  hoverColour: string;
+  name: string;
+  description: string;
 }
 
 export default function JobCompleteDialog({
@@ -83,7 +79,7 @@ export default function JobCompleteDialog({
   const fullscreen = useShouldFullscreen();
   const [editAmountOpen, setEditAmountOpen] = useState<boolean>(false);
 
-  const [closeJobData, isLoading] = useJobCloseMutation();
+  const [closeJobData] = useJobCloseMutation();
 
   async function handleClose() {
     if (!job.id) throw new Error("Job has no ID");
@@ -114,26 +110,25 @@ export default function JobCompleteDialog({
       description: `This job is usually worth ${job.job_config?.default_credit} points.`,
       credit: job.job_config?.default_credit,
     },
-  ]
-    .sort((a, b) => ((a.credit || 0) < (b.credit || 0) ? -1 : 1));
+  ].sort((a, b) => ((a.credit || 0) < (b.credit || 0) ? -1 : 1));
 
-    const defaultIndex = variants.findIndex(({ id = 0 }) => id === null);
+  const defaultIndex = variants.findIndex(({ id = 0 }) => id === null);
 
   const colouredVariants: ColouredVariant[] = variants.map((variant, idx) => ({
-      id: variant.id || null,
-      name: variant.name,
-      credit: variant.credit || 0,
-      description: variant.description,
-      colour: getColour(idx - defaultIndex, 1),
-      hoverColour: getColour(idx - defaultIndex, 0.75),
-      idx,
-    }));
+    id: variant.id || null,
+    name: variant.name,
+    credit: variant.credit || 0,
+    description: variant.description,
+    colour: getColour(idx - defaultIndex, 1),
+    hoverColour: getColour(idx - defaultIndex, 0.75),
+    idx,
+  }));
 
   const selectedVariant = colouredVariants.find(({ id }) => id === variantId);
-  
+
   return (
     <Dialog
-    fullWidth={true}
+      fullWidth={true}
       maxWidth="sm"
       fullScreen={fullscreen}
       open={open}
@@ -167,18 +162,27 @@ export default function JobCompleteDialog({
                         {selectedVariant?.credit}
                       </Avatar>
                     </ListItemAvatar>
-                    {variants.length > 1 ? <ListItemText
-                      primary={job.name}
-                      secondary={selectedVariant?.name}
-                    />: <ListItemText primary={job.name} secondary={`This job is worth ${selectedVariant?.credit} points`} />}
-                    {variants.length > 1 && <IconButton
-                      onClick={() => {
-                        setEditAmountOpen(true);
-                      }}
-                      color="primary"
-                    >
-                      <Edit />
-                    </IconButton>}
+                    {variants.length > 1 ? (
+                      <ListItemText
+                        primary={job.name}
+                        secondary={selectedVariant?.name}
+                      />
+                    ) : (
+                      <ListItemText
+                        primary={job.name}
+                        secondary={`This job is worth ${selectedVariant?.credit} points`}
+                      />
+                    )}
+                    {variants.length > 1 && (
+                      <IconButton
+                        onClick={() => {
+                          setEditAmountOpen(true);
+                        }}
+                        color="primary"
+                      >
+                        <Edit />
+                      </IconButton>
+                    )}
                   </ListItem>
                 </Collapse>
               )}
@@ -221,11 +225,16 @@ export default function JobCompleteDialog({
             </TransitionGroup>
           </List>
         </Card>
-        <JobDelayWidget status="Complete" delay={delay} setDelay={setDelay} job={job} />
+        <JobDelayWidget
+          status="Complete"
+          delay={delay}
+          setDelay={setDelay}
+          job={job}
+        />
         <Card sx={{ mt: 4 }}>
           <List sx={{ p: 0 }}>
             <ListItemButton
-            disabled={editAmountOpen}
+              disabled={editAmountOpen}
               onClick={handleClose}
               sx={{
                 backgroundColor: theme.palette.secondary.main,

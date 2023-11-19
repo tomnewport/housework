@@ -1,25 +1,14 @@
 import {
   AppBar,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogTitle,
   IconButton,
-  List,
-  ListItem,
   Skeleton,
-  Slide,
   Toolbar,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useGetJobByIdQuery } from "../../services/housework/jobs";
-import { TransitionProps } from "@mui/material/transitions";
-import React from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import JobViewContent from "./JobViewContent";
 import { ArrowBack } from "@mui/icons-material";
 import TransitionLeft from "../TransitionLeft";
@@ -91,7 +80,6 @@ export default function JobView({
   handleClose: () => void;
   jobId?: number;
 }) {
-
   const { data: jobData, isLoading } = useGetJobByIdQuery(jobId || 0, {
     skip: !!!jobId,
   });

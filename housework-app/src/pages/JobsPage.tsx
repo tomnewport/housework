@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import JobList, { JobGroup } from "../components/job/JobList";
 import JobView from "../components/job/JobView";
 import {
@@ -77,7 +77,11 @@ export default function JobsPage({ jobId }: { jobId?: string }) {
   return (
     <>
       <JobList jobGroups={jobGroups} />
-      <JobView handleClose={() => navigate("/jobs")} open={!!jobId} jobId={parseInt(jobId || '0')} />
+      <JobView
+        handleClose={() => navigate("/jobs")}
+        open={!!jobId}
+        jobId={parseInt(jobId || "0")}
+      />
     </>
   );
 }

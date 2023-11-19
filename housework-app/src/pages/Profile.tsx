@@ -1,4 +1,3 @@
-import React from "react";
 import {
   useGetSelfQuery,
   useLogoutUserMutation,
@@ -12,8 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 
-const ProfilePage = () => {
-  const { data: userData, error, isLoading } = useGetSelfQuery(undefined);
+export default function ProfilePage() {
+  const { data: userData, isLoading } = useGetSelfQuery(undefined);
   const [logoutUser] = useLogoutUserMutation();
   if (isLoading) {
     return <p>Loading...</p>;
@@ -30,13 +29,13 @@ const ProfilePage = () => {
       <Paper elevation={3} style={{ padding: "20px", marginBottom: "20px" }}>
         <List>
           <ListItem>
-            <ListItemText
-              primary="Full name"
-              secondary={userData.full_name}
-            />
+            <ListItemText primary="Full name" secondary={userData.full_name} />
           </ListItem>
           <ListItem>
-            <ListItemText primary="Short name" secondary={userData.short_name} />
+            <ListItemText
+              primary="Short name"
+              secondary={userData.short_name}
+            />
           </ListItem>
           {userData.is_superuser && (
             <ListItem>
@@ -60,5 +59,3 @@ const ProfilePage = () => {
     </div>
   );
 };
-
-export default ProfilePage;

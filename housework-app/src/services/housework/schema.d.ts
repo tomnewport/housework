@@ -3,7 +3,6 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
   "/api/v1/auth/session": {
     /** Get Session */
@@ -945,7 +944,6 @@ export type $defs = Record<string, never>;
 export type external = Record<string, never>;
 
 export interface operations {
-
   /** Get Session */
   hwk_apps_api_v1_auth_get_session: {
     responses: {
@@ -1627,7 +1625,13 @@ export interface operations {
         config_id?: number[];
         only_self?: boolean;
         team_id?: string[];
-        status?: ("Scheduled" | "Open" | "Overdue" | "Complete" | "Cancelled")[];
+        status?: (
+          | "Scheduled"
+          | "Open"
+          | "Overdue"
+          | "Complete"
+          | "Cancelled"
+        )[];
         limit?: number;
         offset?: number;
       };

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Chip,
   Skeleton,
-  ChipProps,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -13,7 +12,6 @@ import {
   Button,
 } from "@mui/material";
 import {
-  EmojiEventsRounded,
   Schedule,
   PlayCircleFilled,
   ErrorOutline,
@@ -64,8 +62,12 @@ export default function JobCreditChip({ job }: JobCreditChipProps) {
         icon={icon}
         label={job.status}
       />
-      <Dialog  fullWidth={true}
-      maxWidth="sm" open={open} onClose={() => setOpen(false)}>
+      <Dialog
+        fullWidth={true}
+        maxWidth="sm"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <DialogTitle>Assigner process</DialogTitle>
         <DialogContent>
           <List>

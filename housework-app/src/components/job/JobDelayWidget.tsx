@@ -24,29 +24,28 @@ import { TransitionGroup } from "react-transition-group";
 import { Bolt, EditCalendar, Repeat } from "@mui/icons-material";
 import { DateTime } from "luxon";
 
-
 function formatDate(dateStr: string) {
   const date = DateTime.fromISO(dateStr);
 
   // Check if the date is valid
   if (!date.isValid) {
-      return "Invalid date";
+    return "Invalid date";
   }
 
   // Format the date
-  const formattedDate = date.toFormat('cccc d MMMM');
+  const formattedDate = date.toFormat("cccc d MMMM");
 
   // Calculate the difference in days from now
   const now = DateTime.now();
-  const diffInDays = date.diff(now, 'days').days;
+  const diffInDays = date.diff(now, "days").days;
   let relativeTime;
 
   if (diffInDays < 0) {
-      relativeTime = `${Math.abs(Math.floor(diffInDays))} days ago`;
+    relativeTime = `${Math.abs(Math.floor(diffInDays))} days ago`;
   } else if (diffInDays === 0) {
-      relativeTime = "today";
+    relativeTime = "today";
   } else {
-      relativeTime = `in ${Math.ceil(diffInDays)} days`;
+    relativeTime = `in ${Math.ceil(diffInDays)} days`;
   }
 
   return `${formattedDate} (${relativeTime})`;
@@ -61,7 +60,7 @@ export default function JobDelayWidget({
   delay: number;
   setDelay: (a: number) => void;
   job: GetJobByIDResponse;
-  status: "Complete" | "Cancelled"
+  status: "Complete" | "Cancelled";
 }) {
   if (!job.id) {
     throw new Error("Job has no ID");
@@ -145,8 +144,12 @@ export default function JobDelayWidget({
           )}
         </TransitionGroup>
       </List>
-      <Dialog fullWidth={true}
-      maxWidth="sm" open={delayDlgOpen} onClose={() => setDelayDlgOpen(false)}>
+      <Dialog
+        fullWidth={true}
+        maxWidth="sm"
+        open={delayDlgOpen}
+        onClose={() => setDelayDlgOpen(false)}
+      >
         <DialogTitle>Change delay</DialogTitle>
         <DialogContent>
           <TextField

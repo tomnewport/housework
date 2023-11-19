@@ -1,36 +1,13 @@
 import apiService from "./index";
-import { Type, plainToClass } from "class-transformer";
 import { paths } from "./schema";
 
-export type GetSelfResponse = paths["/api/v1/people/users/self/"]["get"]["responses"]["200"]["content"]["application/json"]
-export type UpdateSelfResponse = paths["/api/v1/people/users/self/"]["patch"]["responses"]["200"]["content"]["application/json"]
-export type UpdateSelfRequest = paths["/api/v1/people/users/self/"]["patch"]["requestBody"]["content"]["application/json"];
+export type GetSelfResponse =
+  paths["/api/v1/people/users/self/"]["get"]["responses"]["200"]["content"]["application/json"];
+export type UpdateSelfResponse =
+  paths["/api/v1/people/users/self/"]["patch"]["responses"]["200"]["content"]["application/json"];
+export type UpdateSelfRequest =
+  paths["/api/v1/people/users/self/"]["patch"]["requestBody"]["content"]["application/json"];
 
-
-class UserSelf {
-  id!: number;
-  username!: string;
-  approved!: boolean;
-  first_name!: string;
-  last_name!: string;
-  is_superuser!: boolean;
-
-  @Type(() => Date)
-  date_joined!: Date;
-
-  preferences!: Record<string, unknown>; // Adjust as needed
-}
-
-interface UserSelfResponse {
-  id: number;
-  username: string;
-  approved: boolean;
-  first_name: string;
-  last_name: string;
-  is_superuser: boolean;
-  date_joined: string;
-  preferences: Record<string, unknown>;
-}
 
 export const extendedApiService = apiService.injectEndpoints({
   endpoints: (builder) => ({
@@ -38,7 +15,7 @@ export const extendedApiService = apiService.injectEndpoints({
       query: (sub) => ({
         url: "/api/v1/auth/otp/send",
         method: "POST",
-        body: {sub},
+        body: { sub },
       }),
       transformResponse: (response: Record<string, string>) => {
         localStorage.setItem("houseworkApi.headers", JSON.stringify(response));
@@ -49,7 +26,7 @@ export const extendedApiService = apiService.injectEndpoints({
       query: (code) => ({
         url: "/api/v1/auth/otp/respond",
         method: "POST",
-        body: {code},
+        body: { code },
       }),
       transformResponse: (response: Record<string, string>) => {
         localStorage.setItem("houseworkApi.headers", JSON.stringify(response));
@@ -96,5 +73,11 @@ export const extendedApiService = apiService.injectEndpoints({
   }),
 });
 
-export const { useUpdateSelfMutation, useSendOtpMutation, useRespondOtpMutation, useGetSelfQuery, useLoginUserMutation, useLogoutUserMutation } =
-  extendedApiService;
+export const {
+  useUpdateSelfMutation,
+  useSendOtpMutation,
+  useRespondOtpMutation,
+  useGetSelfQuery,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+} = extendedApiService;

@@ -1,7 +1,6 @@
 import {
   Card,
   List,
-  ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemIcon,
@@ -11,13 +10,11 @@ import {
 import { useGetSelfQuery } from "../../services/housework/auth";
 import {
   GetJobByIDResponse,
-  useGetJobDryRunQuery,
 } from "../../services/housework/jobs";
 import { useState } from "react";
 import JobCompleteDialog from "./JobCompleteDialog";
 import JobCancelDialog from "./JobCancelDialog";
 import { Check, SkipNext } from "@mui/icons-material";
-import { purple } from "@mui/material/colors";
 
 interface JobCompleterWidgetProps {
   job: GetJobByIDResponse;
@@ -37,8 +34,6 @@ export default function JobCompleterWidget({
   const isPastDue = job.status === "Overdue";
 
   const canComplete = isPastDue || (isAssignee && isOpen);
-
-  const variants = job.job_config?.variants || [];
 
   const theme = useTheme();
 
@@ -82,8 +77,8 @@ export default function JobCompleterWidget({
             </ListItemAvatar>
             <ListItemText primary="Complete job" />
           </ListItemButton>
-          </List>
-          </Card>
+        </List>
+      </Card>
       <Card sx={{ mt: 4 }}>
         <List sx={{ p: 0 }}>
           <ListItemButton onClick={() => setCancelOpen(true)}>

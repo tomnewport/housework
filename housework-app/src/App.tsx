@@ -1,11 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import HomePage from "./pages/HomePage";
-import { BrowserRouter as Router, Route, Routes, useNavigate, useParams } from "react-router-dom";
-import RequireLogin from "./components/RequireLogin";
+import { useEffect, useMemo, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Site from "./components/Site";
-import { useGetUnreadNotificationsQuery, useMarkNotificationAsReadMutation, useSubscribeMutation } from "./services/housework/notifications";
+import {
+  useMarkNotificationAsReadMutation,
+  useSubscribeMutation,
+} from "./services/housework/notifications";
 import UAParser from "ua-parser-js";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import useNotificationPermission from "./components/notification/useNotificationPermission";
 import { debounce } from "@mui/material";
 import { useDispatch } from "react-redux";
@@ -18,38 +25,43 @@ function NotificationRedirect() {
   const { notificationId = "0" } = useParams();
   const [markRead] = useMarkNotificationAsReadMutation();
   const [isError, setIsError] = useState<boolean>(false);
-  
 
   useEffect(() => {
-    markRead(parseInt(notificationId)).unwrap()
-      .then(url => navigate(url))
-      .catch(() => setIsError(true))
-  }, [markRead, navigate])
-  if (!isError) return null
-  return <p>Error - notification no longer exists! <button onClick={() => navigate("/")}>OK</button></p>
-}
+    markRead(parseInt(notificationId))
+      .unwrap()
+      .then((url) => navigate(url))
+      .catch(() => setIsError(true));
+  }, [markRead, navigate, notificationId]);
 
+  if (!isError) return null;
+  return (
+    <p>
+      Error - notification no longer exists!{" "}
+      <button onClick={() => navigate("/")}>OK</button>
+    </p>
+  );
+}
 
 function createClientId() {
   const newUUID = uuidv4();
   const ua = new UAParser();
   const id = `${ua.getBrowser()?.name} on ${ua.getOS()?.name}|${newUUID}`;
-  window.localStorage.setItem('housework.x-client-id', id);
+  window.localStorage.setItem("housework.x-client-id", id);
   return id;
 }
 
 function getClientId(): string {
-  const clientId = window.localStorage.getItem('housework.x-client-id');
+  const clientId = window.localStorage.getItem("housework.x-client-id");
   if (!clientId) return createClientId();
   return clientId;
 }
 
 function urlBase64ToUint8Array(base64String: string) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
-  
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
 
@@ -62,83 +74,100 @@ function urlBase64ToUint8Array(base64String: string) {
 function ServiceWorkerListener() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Define the event listener function
     const handleServiceWorkerMessage = (event: MessageEvent) => {
-      
       if (!event.data.action) {
         return;
       }
 
       switch (event.data.action) {
-        case 'goto':
+        case "goto":
           window.focus();
-          dispatch(apiService.util.invalidateTags(['jobs', 'notifications', 'subscriptions', 'teams']))
-          navigate(event.data.url || '/')
+          dispatch(
+            apiService.util.invalidateTags([
+              "jobs",
+              "notifications",
+              "subscriptions",
+              "teams",
+            ]),
+          );
+          navigate(event.data.url || "/");
           break;
       }
     };
-  
+
     if (navigator.serviceWorker) {
-      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+      navigator.serviceWorker.addEventListener(
+        "message",
+        handleServiceWorkerMessage,
+      );
     }
 
     return () => {
       if (navigator.serviceWorker) {
-        navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+        navigator.serviceWorker.removeEventListener(
+          "message",
+          handleServiceWorkerMessage,
+        );
       }
     };
-  }, []);
+  }, [dispatch, navigate]);
 
   return null;
 }
 
-
 function App() {
+  const [subscribe] = useSubscribeMutation();
+  const { data: selfData } = useGetSelfQuery();
 
-    const [subscribe, isLoading] = useSubscribeMutation();
-    const { data: selfData } = useGetSelfQuery();
+  const notificationPermission = useNotificationPermission();
 
-    const notificationPermission = useNotificationPermission();
-
-    const handleSetup = useMemo(() => {
-      async function innerHandleSetup() {
-        if (notificationPermission === 'granted') {
+  const handleSetup = useMemo(() => {
+    async function innerHandleSetup() {
+      if (notificationPermission === "granted") {
         const sw = await navigator.serviceWorker.ready;
         const subscribeOptions = {
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array('BFSP1k6ksWes7cFHVHbdDgl_zJPCwrIbXZVnzEHgWSK9aeDbOzX0rNHIBEaWxAZrBdcVZKZdnPFe7i1mCs2nppI')
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            "BFSP1k6ksWes7cFHVHbdDgl_zJPCwrIbXZVnzEHgWSK9aeDbOzX0rNHIBEaWxAZrBdcVZKZdnPFe7i1mCs2nppI",
+          ),
         };
-    
+
         const sub = await sw.pushManager.subscribe(subscribeOptions);
         try {
           await subscribe({
-              channel_type: "BRW_PSH",
-              config: JSON.parse(JSON.stringify(sub)),
-              name: getClientId(),
-              enabled: true,
+            channel_type: "BRW_PSH",
+            config: JSON.parse(JSON.stringify(sub)),
+            name: getClientId(),
+            enabled: true,
           }).unwrap();
         } catch (e) {}
-    }}
+      }
+    }
     if (selfData) return () => {};
     return debounce(innerHandleSetup, 500);
-    }, [selfData]);
-    
+  }, [selfData, subscribe, notificationPermission]);
 
-    useEffect(() => {if (notificationPermission == 'granted') handleSetup()}, [notificationPermission]);
+  useEffect(() => {
+    if (notificationPermission === "granted") handleSetup();
+  }, [notificationPermission, handleSetup]);
   return (
     <>
-    <AuthWall>
-      <Router>
-        <ServiceWorkerListener />
-        <Routes>
-          <Route path="/" element={<Site />} />
-          <Route path="/notification/:notificationId" element={<NotificationRedirect />} />
-          <Route path="/:section?/:subsection?/" element={<Site />}/>
-        </Routes>
-      </Router>
-    </AuthWall>
+      <AuthWall>
+        <Router>
+          <ServiceWorkerListener />
+          <Routes>
+            <Route path="/" element={<Site />} />
+            <Route
+              path="/notification/:notificationId"
+              element={<NotificationRedirect />}
+            />
+            <Route path="/:section?/:subsection?/" element={<Site />} />
+          </Routes>
+        </Router>
+      </AuthWall>
     </>
   );
 }

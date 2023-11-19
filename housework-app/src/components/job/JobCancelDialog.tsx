@@ -1,55 +1,26 @@
 import {
-  Alarm,
   ArrowBack,
-  Bolt,
-  Edit,
-  EditAttributes,
-  EditCalendar,
-  MoreVert,
-  Repeat,
   SkipNext,
 } from "@mui/icons-material";
 import {
   AppBar,
-  Avatar,
-  Button,
   Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  FormControlLabel,
-  Icon,
   IconButton,
   List,
-  ListItem,
-  ListItemAvatar,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Skeleton,
-  Switch,
-  TextField,
   Toolbar,
   Typography,
   useTheme,
 } from "@mui/material";
-import { blue, red } from "@mui/material/colors";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   GetJobByIDResponse,
-  useGetJobDryRunQuery,
   useJobCloseMutation,
 } from "../../services/housework/jobs";
-import { Job } from "../../services/housework/types";
-import { TransitionGroup } from "react-transition-group";
-import { NumberLiteralType } from "typescript";
 import TransitionLeft from "../TransitionLeft";
 import { useShouldFullscreen } from "../../utils/mediaQuery";
 import JobDelayWidget from "./JobDelayWidget";
@@ -70,7 +41,7 @@ export default function JobCancelDialog({
   const [delay, setDelay] = useState<number>(0);
   const theme = useTheme();
 
-  const [closeJobData, isLoading] = useJobCloseMutation();
+  const [closeJobData] = useJobCloseMutation();
 
   async function handleClose() {
     if (!job.id) throw new Error("Job has no ID");
@@ -118,7 +89,12 @@ export default function JobCancelDialog({
       </AppBar>
       <DialogContent>
         You are about to skip this job. No credit will be awarded.
-        <JobDelayWidget status="Cancelled" delay={delay} setDelay={setDelay} job={job} />
+        <JobDelayWidget
+          status="Cancelled"
+          delay={delay}
+          setDelay={setDelay}
+          job={job}
+        />
         <Card sx={{ mt: 4 }}>
           <List sx={{ p: 0 }}>
             <ListItemButton

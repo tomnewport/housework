@@ -7,7 +7,6 @@ import {
   Typography,
 } from "@mui/material";
 import { GetJobByIDResponse } from "../../services/housework/jobs";
-import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import JobStatusChip from "./JobStatusChip";
 import Markdown from "react-markdown";

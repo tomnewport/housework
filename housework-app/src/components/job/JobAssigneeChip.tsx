@@ -4,10 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
   Skeleton,
 } from "@mui/material";
 import { GetJobByIDResponse } from "../../services/housework/jobs";
@@ -68,9 +64,7 @@ export default function JobAssigneeChip({ job }: JobAssigneeChipProps) {
               },
             }}
           >
-            <Markdown remarkPlugins={[remarkGfm]}>
-              {job.explanation}
-            </Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>{job.explanation}</Markdown>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpen(false)}>Close</Button>

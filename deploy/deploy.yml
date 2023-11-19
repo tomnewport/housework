@@ -11,7 +11,4 @@
         dest: "{{ deploy_root }}/app"
       become: yes
 
-  environment:
-    ANSIBLE_HOST_KEY_CHECKING: False
-    ANSIBLE_PRIVATE_KEY_FILE: "{{ lookup('env','TDNSH_DEPLOY_PRIVATE_KEY') }}"
 

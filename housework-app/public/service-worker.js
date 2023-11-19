@@ -1,0 +1,53 @@
+const appBaseUrl = "%PUBLIC_URL%".startsWith("%") ? "http://localhost:3000" : "%PUBLIC_URL";
+
+self.addEventListener('install', (event) => {
+    
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('push', function(event) {
+    const data = event.data.json();
+    console.log(data);
+    const title = "Hello!"
+    const options = {
+      body: data.body,
+      data: data.id,
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  });
+  
+  self.addEventListener('notificationclick', function(event) {
+    event.notification.close(); // Close the notification
+    const notificationId = event.notification.data;
+
+    // URL to navigate to
+    const urlToOpen = new URL(`/notification/${notificationId}`, appBaseUrl).href;
+
+
+    const promiseChain = clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true
+    })
+    .then((windowClients) => {
+        const found = [...windowClients]
+          .sort((a) => a.visibilityState === 'visible' ? -1 : 1)
+          .find(({ url }) => url.startsWith(appBaseUrl));
+
+        if (found) {
+            return found.focus().then(client => {
+                return client.postMessage({action: 'goto', url: `/notification/${notificationId}`});
+            });
+        } else {
+            return clients.openWindow(urlToOpen);
+        }
+    })
+    .catch(err => console.error(err));
+
+    event.waitUntil(promiseChain);
+});

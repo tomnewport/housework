@@ -1,51 +1,49 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.utils import timezone
-from ninja import Router, Schema
+from ninja import Router, Schema, Body, ModelSchema
 from ninja.pagination import paginate
 from pydantic import EmailStr
 
-from hwk.apps.api.auth import TurnstileProtected, ApprovedUserAuth
-from hwk.apps.api.v1.schema import UserSchema
+from hwk.apps.api.auth import TurnstileProtected, HeaderUserAuth
+from hwk.apps.api.v1.schema import UserSchema, UserSelfSchema
 from hwk.apps.people.models import HwkUser
 from hwk.apps.teams.models import Membership
 
 people_router = Router(tags=["People"])
 
 
-class UserCreateSchema(Schema):
-    username: str
-    first_name: str
-    last_name: str
-    email: EmailStr
-    password: str
+class UserEditSchema(Schema):
+    full_name: Optional[str]
+    short_name: Optional[str]
+    password: Optional[str]
 
 
-class UserResponseSchema(Schema):
-    username: str
-    first_name: str
-    last_name: str
-    email: str
-    approved: bool
+class UserResponseSchema(ModelSchema):
+    has_usable_password: bool
+
+    class Config:
+        model = HwkUser
+        model_fields = ["full_name", "short_name", "email"]
 
 
 class UserListSchema(Schema):
     username: str
-    first_name: Optional[str]
-    last_name: Optional[str]
+    full_name: Optional[str]
+    short_name: Optional[str]
     email: Optional[str]
     approved: bool
 
 
 class UserDetailSchema(Schema):
     username: str
-    first_name: Optional[str]
-    last_name: Optional[str]
+    full_name: Optional[str]
+    short_name: Optional[str]
     email: str
     logged_in_since: datetime
     session_expires: datetime
@@ -66,30 +64,36 @@ def get_users(request):
     if request.user.is_superuser:
         users = HwkUser.objects.all()
     elif request.user.approved:
-        teams = Membership.objects.filter(user=request.user).values_list('team', flat=True)
-        users = HwkUser.objects.filter(
-            memberships__team__in=teams
-        ).distinct()
+        teams = Membership.objects.filter(user=request.user).values_list(
+            "team", flat=True
+        )
+        users = HwkUser.objects.filter(memberships__team__in=teams).distinct()
     else:
         users = HwkUser.objects.filter(id=request.user.id)
     return users
 
 
-@people_router.post("/users/", response=UserResponseSchema, auth=[TurnstileProtected(), ApprovedUserAuth()])
-def create_user(request, user: UserCreateSchema):
-    user = HwkUser(
-        username=user.username,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        email=user.email,
-        password=make_password(user.password),
-        approved=False  # Set approved to False by default
-    )
-    user.save()
-    return user
+@people_router.patch(
+    "/users/self/",
+    response=UserResponseSchema,
+    auth=[HeaderUserAuth(require_approved=False)],
+)
+def update_user(request, data: UserEditSchema):
+    for key, value in data.dict(exclude_unset=True).items():
+        if key in ["full_name", "short_name"]:
+            setattr(request.user, key, value)
+        if key == "password":
+            request.user.set_password(value)
+
+    request.user.save()
+    return request.user
 
 
-@people_router.get("/users/self/", response=Optional[UserSchema], auth=[TurnstileProtected(), ApprovedUserAuth()])
+@people_router.get(
+    "/users/self/",
+    response=Optional[UserSelfSchema],
+    auth=[HeaderUserAuth(require_approved=False)],
+)
 def get_current_user(request):
     if not request.user.is_authenticated:
         return None
@@ -97,9 +101,23 @@ def get_current_user(request):
     return request.user
 
 
-@people_router.post("/users/{username}/approve", response={200: ActionResponse, 404: ActionResponse, 403: ActionResponse})
+@people_router.put("/users/self/preferences", response=Optional[UserSelfSchema])
+def set_current_user_preferences(request, preferences: Dict[str, Any] = Body({})):
+    request.user.preferences = preferences
+    request.user.save()
+
+    return request.user
+
+
+@people_router.post(
+    "/users/{username}/approve",
+    response={200: ActionResponse, 404: ActionResponse, 403: ActionResponse},
+)
 def approve_user(request, username: str):
-    if not (request.user.is_superuser or Membership.objects.filter(user=request.user, role='Admin').exists()):
+    if not (
+        request.user.is_superuser
+        or Membership.objects.filter(user=request.user, role="Admin").exists()
+    ):
         return 403, {"success": False, "message": "Permission denied"}
 
     try:
@@ -117,7 +135,10 @@ class PasswordChangeModel(Schema):
     new_password: str
 
 
-@people_router.post("/users/self/password", response={403: ActionResponse, 401: ActionResponse, 200: ActionResponse})
+@people_router.post(
+    "/users/self/password",
+    response={403: ActionResponse, 401: ActionResponse, 200: ActionResponse},
+)
 def change_password(request, password_data: PasswordChangeModel):
     user = request.user
     if not user.is_authenticated:

@@ -1,6 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from hwk.apps.people.models import HwkUser
+from hwk.apps.people.models import HwkUser, Holiday
 
-admin.site.register(HwkUser, UserAdmin)
+
+@admin.register(HwkUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Holiday)

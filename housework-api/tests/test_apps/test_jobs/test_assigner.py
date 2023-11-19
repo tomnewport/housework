@@ -6,7 +6,14 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from hwk.apps.jobs.assigner import create_job_from_trigger
-from hwk.apps.jobs.models import JobConfig, JobTrigger, JobLifecycle, Job, Credit, JobScheduleRule
+from hwk.apps.jobs.models import (
+    JobConfig,
+    JobTrigger,
+    JobLifecycle,
+    Job,
+    Credit,
+    JobScheduleRule,
+)
 from hwk.apps.people.models import HwkUser, Holiday
 from hwk.apps.teams.models import Team, Membership
 
@@ -27,22 +34,18 @@ def setup_db():
         team.save()
 
         user_1_membership = Membership(
-            team=team,
-            role=Membership.RoleChoices.Admin,
-            user=user_1
+            team=team, role=Membership.RoleChoices.Admin, user=user_1
         )
         user_1_membership.save()
         user_2_membership = Membership(
-            team=team,
-            role=Membership.RoleChoices.Admin,
-            user=user_2
+            team=team, role=Membership.RoleChoices.Admin, user=user_2
         )
         user_2_membership.save()
 
         user_1_holiday = Holiday(
             user=user_1,
             from_time=timezone.now(),
-            to_time=timezone.now() + timedelta(days=10)
+            to_time=timezone.now() + timedelta(days=10),
         )
         user_1_holiday.save()
 
@@ -63,7 +66,7 @@ def setup_db():
         dishwasher_trigger = JobTrigger(
             from_config=dishwasher_config,
             create_config=dishwasher_config,
-            lifecycle=JobLifecycle.COMPLETE,
+            lifecycle_complete=True,
             urgent=False,
         )
         dishwasher_trigger.save()
@@ -71,11 +74,12 @@ def setup_db():
         dishwasher_rule = JobScheduleRule(
             trigger=dishwasher_trigger,
             rule_type=JobScheduleRule.RuleType.DAYS_SINCE,
-            params='{"event": "closed", "days": 4}'
+            params={"event": "closed", "days": 4},
         )
         dishwasher_rule.save()
 
         dishwasher_previous = Job(
+            team=dishwasher_config.team,
             job_config=dishwasher_config,
             name=dishwasher_config.name,
             default_credit=dishwasher_config.default_credit,
@@ -85,6 +89,7 @@ def setup_db():
         dishwasher_previous.save()
 
         laundry_previous = Job(
+            team=laundry_config.team,
             job_config=laundry_config,
             name=laundry_config.name,
             default_credit=laundry_config.default_credit,
@@ -93,17 +98,9 @@ def setup_db():
         )
         laundry_previous.save()
 
-        Credit(
-            person=user_1_membership,
-            amount=10,
-            job=dishwasher_previous
-        ).save()
+        Credit(person=user_1_membership, amount=10, job=dishwasher_previous).save()
 
-        Credit(
-            person=user_2_membership,
-            amount=20,
-            job=laundry_previous
-        ).save()
+        Credit(person=user_2_membership, amount=20, job=laundry_previous).save()
 
     return TestData
 
@@ -200,7 +197,9 @@ class AssignerTest(TestCase):
 
         job = create_job_from_trigger(data.dishwasher_previous, data.dishwasher_trigger)
 
-        self.assertEqual(job.description, expected_scheduler.replace("Available from: 2023-01-12", "Available from: 2023-01-05"))
-
-
-
+        self.assertEqual(
+            job.description,
+            expected_scheduler.replace(
+                "Available from: 2023-01-12", "Available from: 2023-01-05"
+            ),
+        )

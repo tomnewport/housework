@@ -69,6 +69,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build-directory
+          path: housework-app/build/
 
       - name: Set up Python
         uses: actions/setup-python@v2

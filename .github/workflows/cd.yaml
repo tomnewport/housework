@@ -71,7 +71,7 @@ jobs:
           pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook deploy/hosts.ini deploy/deploy.yml
+        run: ansible-playbook -i deploy/hosts.ini deploy/deploy.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
           TDNSH_DEPLOY_PRIVATE_KEY: ${{ secrets.TDNSH_KEY }}

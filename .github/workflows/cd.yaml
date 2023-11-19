@@ -54,3 +54,24 @@ jobs:
         name: build-directory
         path: housework-app/build/
 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook deploy/hosts.ini deploy/deploy.yml
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+          TDNSH_DEPLOY_PRIVATE_KEY: ${{ secrets.TDNSH_KEY }}

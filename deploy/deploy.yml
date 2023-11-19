@@ -3,12 +3,42 @@
   hosts: all
   vars:
     deploy_root: /opt/housework/
+    deploy_tag: 'latest'
 
   tasks:
+    - name: Ensure deploy_root exists
+      file:
+        path: "{{ deploy_root }}"
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: Write .env file from APP_CONFIG
+      copy:
+        content: "{{ lookup('env', 'APP_CONFIG') }}"
+        dest: "{{ deploy_root }}/.env"
+      become: yes
+
     - name: Copy artifact to remote server
       copy:
         src: "housework-app/build/"
         dest: "{{ deploy_root }}/app"
       become: yes
 
+    - name: Template out docker-compose.jinja2.yml to deploy_root/docker-compose.yml
+      template:
+        src: docker-compose.yml.jinja2
+        dest: "{{ deploy_root }}/docker-compose.yml"
+      become: yes
 
+    - name: Pull all images in docker-compose
+      community.docker.docker_compose:
+        project_src: "{{ deploy_root }}"
+        pull: yes
+      become: yes
+
+    - name: Restart docker-compose to run new images
+      community.docker.docker_compose:
+        project_src: "{{ deploy_root }}"
+        restarted: yes
+      become: yes

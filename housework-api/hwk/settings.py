@@ -14,7 +14,7 @@ from pathlib import Path
 
 from hwk.environment import HwkEnviron
 
-_environ = HwkEnviron(_env_file='/Users/tom/housework/.env')
+_environ = HwkEnviron(_env_file='../.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

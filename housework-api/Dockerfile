@@ -1,6 +1,6 @@
 FROM python:3.10
 
-RUN pip install "poetry==$POETRY_VERSION"
+RUN pip install "poetry==1.7.1"
 
 COPY . /app/housework-api/
 

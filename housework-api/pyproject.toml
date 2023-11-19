@@ -10,7 +10,7 @@ packages = [{include = "housework_api"}]
 python = "^3.9"
 Django = "^4.2.7"
 django-ninja = "^0.22.2"
-pydantic = {version = "1.10.13", extras = ["email"]}
+pydantic = {version = "<2.0.0", extras = ["email", "dotenv"]}
 freezegun = "^1.2.2"
 coverage = "^7.3.2"
 requests = "^2.31.0"

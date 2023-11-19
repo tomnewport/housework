@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from hwk.environment import HwkEnviron
+
+_environ = HwkEnviron(_env_file='/Users/tom/housework/.env')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-_sc=kb3hg-ct*oamlsuqxb+zm+3x5wbrumn0%v88wuk%k*e51$"
+SECRET_KEY = _environ.hwk_django_secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _environ.hwk_sec_django_debug
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = _environ.hwk_sec_allowed_hosts
 
 
 # Application definition
@@ -130,9 +134,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "people.HwkUser"
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
+CORS_ALLOWED_ORIGINS = _environ.hwk_sec_cors_origins
 
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
 
@@ -149,9 +151,7 @@ CORS_ALLOW_HEADERS = [
     "x-sessionid",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-]
+CSRF_TRUSTED_ORIGINS = _environ.hwk_sec_csrf_trusted
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -161,13 +161,24 @@ CELERY_TIMEZONE = "Europe/London"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
-CELERY_BROKER_URL = "redis://localhost"
+CELERY_BROKER_URL = _environ.hwk_celery_broker_url
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = None
-EMAIL_USE_TLS = True
-EMAIL_PORT = None
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = None
-EMAIL_HOST_PASSWORD = None
+EMAIL_BACKEND = _environ.hwk_smtp_email_backend
+EMAIL_HOST = _environ.hwk_smtp_email_host
+EMAIL_USE_TLS = _environ.hwk_smtp_email_use_tls
+EMAIL_PORT = _environ.hwk_smtp_email_port
+EMAIL_USE_SSL = _environ.hwk_smtp_email_use_ssl
+EMAIL_HOST_USER = _environ.hwk_smtp_email_host_user
+EMAIL_HOST_PASSWORD = _environ.hwk_smtp_email_host_password
+
+WEBPUSH_VAPID_PRIVATE = _environ.hwk_webpush_vapid_private
+WEBPUSH_VAPID_PUBLIC = _environ.hwk_webpush_vapid_public
+
+SECURE_HSTS_SECONDS = 60 * 60 if _environ.hwk_sec_is_prod else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _environ.hwk_sec_is_prod
+SECURE_HSTS_PRELOAD = _environ.hwk_sec_is_prod
+
+SECURE_SSL_REDIRECT = _environ.hwk_sec_is_prod
+SESSION_COOKIE_SECURE = _environ.hwk_sec_is_prod
+CSRF_COOKIE_SECURE = _environ.hwk_sec_is_prod

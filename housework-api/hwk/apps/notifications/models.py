@@ -1,6 +1,7 @@
 import json
 
 from celery import current_app, shared_task
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from pywebpush import webpush, WebPushException
@@ -33,7 +34,7 @@ def browser_push(channel: SubscriptionChannel, notification: 'Notification'):
                 "body": notification.body,
                 "id": notification.id,
             }),
-            vapid_private_key=,
+            vapid_private_key=settings.WEBPUSH_VAPID_PRIVATE,
             vapid_claims={
                 "sub": "mailto:webmaster@tdn.sh"
             }

@@ -7,6 +7,13 @@
     deploy_tag: 'development'
 
   tasks:
+    - name: Install Docker for Python
+      ansible.builtin.pip:
+        name: docker
+        state: present
+      become: yes
+
+  tasks:
     - name: Ensure deploy_root exists
       file:
         path: "{{ deploy_root }}"

@@ -3,3 +3,11 @@ version: '2'
 services:
   broker:
     image: redis
+
+  api:
+    image: tomnewport/housework:development
+    command: ["poetry", "run", "gunicorn", "-w", "4", "hwk.wsgi"]
+
+  worker:
+    image: tomnewport/housework:development
+    command: ["poetry", "run", "celery", "-A", "hwk", "worker", "-l", "INFO", "-B"]

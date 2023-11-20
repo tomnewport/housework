@@ -1,8 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const appBaseUrl = "%PUBLIC_URL%".startsWith("%")
-  ? "http://localhost:3000"
-  : "%PUBLIC_URL%";
+const appBaseUrl = process.env.PUBLIC_URL || "http://localhost:3000";
 
 self.addEventListener("install", (event) => {});
 

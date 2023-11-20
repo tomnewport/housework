@@ -3,6 +3,7 @@
   hosts: all
   vars:
     app_domain: "{{ lookup('env', 'APP_DOMAIN') }}"
+    api_domain: "{{ lookup('env', 'API_DOMAIN') }}"
     deploy_root: "/opt/{{ app_domain }}"
     deploy_tag: 'development'
 

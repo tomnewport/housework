@@ -179,6 +179,6 @@ SECURE_HSTS_SECONDS = 60 * 60 if _environ.hwk_sec_is_prod else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _environ.hwk_sec_is_prod
 SECURE_HSTS_PRELOAD = _environ.hwk_sec_is_prod
 
-SECURE_SSL_REDIRECT = _environ.hwk_sec_is_prod
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = _environ.hwk_sec_is_prod
 CSRF_COOKIE_SECURE = _environ.hwk_sec_is_prod

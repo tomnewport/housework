@@ -2,11 +2,21 @@
 - name: Copy artifact to remote server
   hosts: all
   vars:
-    app_domain: housework-dev.tdn.sh
+    app_domain: "{{ lookup('env', 'APP_DOMAIN') }}"
     deploy_root: "/opt/{{ app_domain }}"
     deploy_tag: 'development'
 
   tasks:
+    - name: Install Python 3 and pip
+      become: yes
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian" or ansible_os_family == "Ubuntu"
+
     - name: Install Docker for Python
       ansible.builtin.pip:
         name: docker

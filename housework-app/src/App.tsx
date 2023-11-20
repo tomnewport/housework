@@ -131,7 +131,7 @@ function App() {
         const subscribeOptions = {
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
-            "BFSP1k6ksWes7cFHVHbdDgl_zJPCwrIbXZVnzEHgWSK9aeDbOzX0rNHIBEaWxAZrBdcVZKZdnPFe7i1mCs2nppI",
+            process.env.REACT_APP_VAPID_PUBLIC_KEY,
           ),
         };
 

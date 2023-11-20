@@ -100,5 +100,5 @@ jobs:
         run: ansible-playbook -i deploy/hosts.ini deploy/deploy.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
-          APP_CONFIG: ${{ secrets.APP_CONFIG }}
+          API_CONFIG: ${{ secrets.API_CONFIG }}
           APP_DOMAIN: ${{ vars.APP_DOMAIN }}

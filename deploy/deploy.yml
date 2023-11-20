@@ -32,9 +32,9 @@
         mode: '0755'
       become: yes
 
-    - name: Write .env file from APP_CONFIG
+    - name: Write .env file from API_CONFIG
       copy:
-        content: "{{ lookup('env', 'APP_CONFIG') }}"
+        content: "{{ lookup('env', 'API_CONFIG') }}"
         dest: "{{ deploy_root }}/.env"
       become: yes
 

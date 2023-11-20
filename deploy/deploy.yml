@@ -2,8 +2,9 @@
 - name: Copy artifact to remote server
   hosts: all
   vars:
-    deploy_root: /opt/housework/
-    deploy_tag: 'latest'
+    app_domain: housework-dev.tdn.sh
+    deploy_root: "/opt/{{ app_domain }}"
+    deploy_tag: 'development'
 
   tasks:
     - name: Ensure deploy_root exists

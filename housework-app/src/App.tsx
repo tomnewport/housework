@@ -20,6 +20,11 @@ import apiService from "./services/housework";
 import AuthWall from "./components/auth/AuthWall";
 import { useGetSelfQuery } from "./services/housework/auth";
 
+const vapidPublicKey = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+
+if (vapidPublicKey === undefined) throw new Error('VAPID key not set.')
+
+
 function NotificationRedirect() {
   const navigate = useNavigate();
   const { notificationId = "0" } = useParams();
@@ -131,7 +136,7 @@ function App() {
         const subscribeOptions = {
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
-            process.env.REACT_APP_VAPID_PUBLIC_KEY,
+            vapidPublicKey || '',
           ),
         };
 

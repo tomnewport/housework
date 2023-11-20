@@ -64,7 +64,7 @@
 
     - name: Template app conf
       template:
-        src: docker-compose.yml.jinja2
+        src: housework-app.conf.jinja2
         dest: "/etc/nginx/sites-available/{{ app_domain }}.conf"
       become: yes
 

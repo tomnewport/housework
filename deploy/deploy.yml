@@ -13,7 +13,6 @@
         state: present
       become: yes
 
-  tasks:
     - name: Ensure deploy_root exists
       file:
         path: "{{ deploy_root }}"

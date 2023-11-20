@@ -2,7 +2,7 @@
 
 const appBaseUrl = "%PUBLIC_URL%".startsWith("%")
   ? "http://localhost:3000"
-  : "%PUBLIC_URL";
+  : "%PUBLIC_URL%";
 
 self.addEventListener("install", (event) => {});
 

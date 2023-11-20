@@ -19,7 +19,9 @@
 
     - name: Install Docker for Python
       ansible.builtin.pip:
-        name: docker
+        name:
+          - docker
+          - docker-compose
         state: present
       become: yes
 
@@ -42,7 +44,7 @@
         dest: "{{ deploy_root }}/app"
       become: yes
 
-    - name: Template out docker-compose.jinja2.yml to deploy_root/docker-compose.yml
+    - name: Template compose
       template:
         src: docker-compose.yml.jinja2
         dest: "{{ deploy_root }}/docker-compose.yml"
@@ -58,4 +60,25 @@
       community.docker.docker_compose:
         project_src: "{{ deploy_root }}"
         restarted: yes
+      become: yes
+
+    - name: Template app conf
+      template:
+        src: docker-compose.yml.jinja2
+        dest: "/etc/nginx/sites-available/{{ app_domain }}.conf"
+      become: yes
+
+    - name: Create symlink in sites-enabled
+      file:
+        src: "/etc/nginx/sites-available/{{ app_domain }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ app_domain }}.conf"
+        state: link
+      become: yes
+      notify: Reload nginx
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
       become: yes

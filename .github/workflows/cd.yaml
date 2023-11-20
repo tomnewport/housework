@@ -50,6 +50,10 @@ jobs:
       run: |
         cd housework-app
         npm run build
+      env:
+        PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+        REACT_APP_HOUSEWORK_API_ROOT: ${{ secrets.REACT_APP_HOUSEWORK_API_ROOT }}
+        REACT_APP_VAPID_PUBLIC_KEY: ${{ secrets.REACT_APP_VAPID_PUBLIC_KEY }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2

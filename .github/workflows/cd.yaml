@@ -61,8 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: development
     needs:
-    - build-and-push-docker
-    - build-cra-app
+    - dev-build-and-push-docker
+    - dev-build-cra-app
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

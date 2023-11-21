@@ -5,7 +5,7 @@
     app_domain: "{{ lookup('env', 'APP_DOMAIN') }}"
     api_domain: "{{ lookup('env', 'API_DOMAIN') }}"
     deploy_root: "/opt/{{ app_domain }}"
-    deploy_tag: 'development'
+    deploy_tag: 'latest'
 
   tasks:
     - name: Install Python 3 and pip
@@ -69,10 +69,24 @@
         dest: "/etc/nginx/sites-available/{{ app_domain }}.conf"
       become: yes
 
+    - name: Template api conf
+      template:
+        src: housework-api.conf.jinja2
+        dest: "/etc/nginx/sites-available/{{ api_domain }}.conf"
+      become: yes
+
     - name: Create symlink in sites-enabled
       file:
         src: "/etc/nginx/sites-available/{{ app_domain }}.conf"
         dest: "/etc/nginx/sites-enabled/{{ app_domain }}.conf"
+        state: link
+      become: yes
+      notify: Reload nginx
+
+    - name: Create symlink in sites-enabled
+      file:
+        src: "/etc/nginx/sites-available/{{ api_domain }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ api_domain }}.conf"
         state: link
       become: yes
       notify: Reload nginx

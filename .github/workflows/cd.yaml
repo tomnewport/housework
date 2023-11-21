@@ -10,7 +10,7 @@ on:
 jobs:
   dev-build-and-push-docker:
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     steps:
     - uses: actions/checkout@v2
 
@@ -28,11 +28,11 @@ jobs:
       with:
         context: ./housework-api
         push: true
-        tags: tomnewport/housework:development
+        tags: tomnewport/housework:latest
 
   dev-build-cra-app:
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     steps:
     - uses: actions/checkout@v2
 
@@ -63,7 +63,7 @@ jobs:
 
   dev-deploy-development:
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     needs:
     - dev-build-and-push-docker
     - dev-build-cra-app

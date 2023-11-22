@@ -8,7 +8,7 @@ on:
       - '*'
 
 jobs:
-  dev-build-and-push-docker:
+  prod-build-and-push-docker:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -30,7 +30,7 @@ jobs:
         push: true
         tags: tomnewport/housework:latest
 
-  dev-build-cra-app:
+  prod-build-cra-app:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -61,12 +61,12 @@ jobs:
         name: build-directory
         path: housework-app/build/
 
-  dev-deploy-development:
+  dev-deploy-production:
     runs-on: ubuntu-latest
     environment: production
     needs:
-    - dev-build-and-push-docker
-    - dev-build-cra-app
+    - prod-build-and-push-docker
+    - prod-build-cra-app
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -102,3 +102,4 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: False
           API_CONFIG: ${{ secrets.API_CONFIG }}
           APP_DOMAIN: ${{ vars.APP_DOMAIN }}
+          API_DOMAIN: ${{ vars.API_DOMAIN }}

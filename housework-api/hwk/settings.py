@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "constance",
     "hwk.apps.api",
     "hwk.apps.jobs",
     "hwk.apps.people",
@@ -48,6 +49,10 @@ INSTALLED_APPS = [
     "hwk.apps.notifications",
     "corsheaders",
 ]
+
+CONSTANCE_CONFIG = {
+    'SEND_EMAILS': (True, 'Should emails be sent', bool),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

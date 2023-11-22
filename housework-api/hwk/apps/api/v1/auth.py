@@ -1,12 +1,14 @@
 from datetime import timedelta, datetime
-from typing import List
+from typing import List, Optional
 
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from ninja import Router, Schema, Body
 from ninja.errors import HttpError
+from constance import config
 from django.core.mail import send_mail
 import secrets
 import string
@@ -41,11 +43,6 @@ class OTPRespondRequest(Schema):
     code: str
 
 
-@auth_router.get("/session")
-def get_session(request):
-    return dict(request.session)
-
-
 @auth_router.post("/otp/send", auth=[TurnstileProtected()])
 def send_otp(request, data: OTPSendRequest = Body(...)):
     otp = generate_secure_sequence()
@@ -53,56 +50,77 @@ def send_otp(request, data: OTPSendRequest = Body(...)):
     request.session["otp.challenge.sub"] = data.sub
     request.session["otp.challenge.open"] = True
     request.session["otp.challenge.code"] = otp
+    request.session["otp.challenge.issued"] = timezone.now().isoformat()
     request.session["otp.challenge.expires"] = (timezone.now() + timedelta(minutes=5)).isoformat()
-    print("OTP is", otp)
-    # send_mail(
-    #     "Subject here",
-    #     "Here is the message.",
-    #     "from@example.com",
-    #     [sub],
-    #     fail_silently=False,
-    # )
+    revealed: Optional[str] = None
+
+    if config.SEND_EMAILS:
+        request.session["otp.challenge.bypassed"] = False
+        send_mail(
+            "Housework | Verify your identity",
+            "Your one-time password is: " + otp,
+            "noreply@housework.tdn.sh",
+            [data.sub],
+            fail_silently=False,
+        )
+    elif settings.DJANGO_DEBUG:
+        request.session["otp.challenge.bypassed"] = True
+        revealed = otp
+
     request.session.save()
+
     return {
         "x-sessionid": request.session.session_key,
+        "revealed": revealed
     }
 
 
 @auth_router.post("/otp/respond", auth=[HeaderUserAuth(require_user=False)])
 def respond_otp(request, data: OTPRespondRequest = Body(...)):
     request.session["otp.challenge.attempts"] = request.session.get("otp.challenge.attempts", 0) + 1
-    print(dict(request.session))
+
     otp_challenge_sub = request.session.get("otp.challenge.sub", None)
     otp_challenge_open = request.session.get("otp.challenge.open", False)
     otp_challenge_code = request.session.get("otp.challenge.code", None)
     otp_challenge_expires_str = request.session.get("otp.challenge.expires", "")
+
+    request.session["otp.challenge.passed"] = None
+
     if "T" in otp_challenge_expires_str:
         otp_challenge_expires = datetime.fromisoformat(otp_challenge_expires_str)
     else:
         otp_challenge_expires = datetime.fromisoformat("2000-01-01T10:00:00")
 
-    if request.session.get("otp.challenge.attempts", 0) > 5:
-        raise HttpError(403, "Too many failed attempts")
+    try:
+        if request.session.get("otp.challenge.attempts", 0) > 5:
+            raise HttpError(403, "Too many failed attempts")
 
-    if not otp_challenge_open:
-        raise HttpError(403, "OTP challenge not open")
+        if not otp_challenge_open:
+            raise HttpError(403, "OTP challenge not open")
 
-    if otp_challenge_expires < timezone.now():
-        raise HttpError(403, "OTP challenge expired")
+        if otp_challenge_expires < timezone.now():
+            raise HttpError(403, "OTP challenge expired")
 
-    if otp_challenge_code is None:
-        raise HttpError(403, "OTP challenge not set")
+        if otp_challenge_code is None:
+            raise HttpError(403, "OTP challenge not set")
 
-    if otp_challenge_code != data.code:
-        raise HttpError(403, "OTP not matched")
+        if otp_challenge_code != data.code:
+            raise HttpError(403, "OTP not matched")
 
-    if otp_challenge_sub is None:
-        raise HttpError(401, "OTP sub not set")
+        if otp_challenge_sub is None:
+            raise HttpError(401, "OTP sub not set")
+    except HttpError:
+        request.session.save()
+        raise
 
     try:
+        request.session["otp.challenge.created"] = False
         user = HwkUser.objects.get(email=otp_challenge_sub)
     except HwkUser.DoesNotExist:
+        request.session["otp.challenge.created"] = True
         user = HwkUser.objects.create_user(username=otp_challenge_sub, email=otp_challenge_sub)
+
+    request.session["otp.challenge.passed"] = timezone.now().isoformat()
 
     login(request, user)
 

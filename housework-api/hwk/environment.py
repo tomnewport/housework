@@ -1,4 +1,4 @@
-from typing import Literal, List
+from typing import Literal, List, Optional
 
 from pydantic import BaseSettings
 import os
@@ -24,3 +24,10 @@ class HwkEnviron(BaseSettings):
     hwk_webpush_vapid_public: str
     hwk_webpush_vapid_private: str
     hwk_sec_is_prod: bool
+
+    hwk_db_engine: str
+    hwk_db_name: str
+    hwk_db_postgres_password: Optional[str]
+    hwk_db_postgres_user: Optional[str]
+    hwk_db_postgres_host: Optional[str]
+    hwk_db_postgres_port: Optional[int]

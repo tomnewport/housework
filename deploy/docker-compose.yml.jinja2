@@ -5,13 +5,19 @@ services:
     image: redis
 
   api:
-    image: tomnewport/housework:development
+    image: tomnewport/housework:latest
     command: ["poetry", "run", "gunicorn", "--bind", "0.0.0.0:8000", "-w", "1", "hwk.wsgi"]
     env_file: .env
     ports:
       - "8000:8000"
 
   worker:
-    image: tomnewport/housework:development
+    image: tomnewport/housework:latest
     command: ["poetry", "run", "celery", "-A", "hwk", "worker", "-l", "INFO", "-B"]
     env_file: .env
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: hwk_rw
+      POSTGRES_PASSWORD: housework

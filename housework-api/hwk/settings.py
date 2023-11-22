@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
 CONSTANCE_CONFIG = {
     'SEND_EMAILS': (True, 'Should emails be sent', bool),
 }
@@ -89,12 +91,24 @@ WSGI_APPLICATION = "hwk.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if _environ.hwk_db_engine == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": _environ.hwk_db_engine,
+            "NAME": BASE_DIR / f"{_environ.hwk_db_name}.sqlite3",
+        }
     }
-}
+elif _environ.hwk_db_engine == "django.db.backends.postgresql_psycopg2":
+    DATABASES = {
+        "default": {
+            'ENGINE': _environ.hwk_db_engine,
+            'NAME': _environ.hwk_db_name,
+            'USER': _environ.hwk_db_postgres_user,
+            'PASSWORD': _environ.hwk_db_postgres_password,
+            'HOST': _environ.hwk_db_postgres_host,
+            'PORT': _environ.hwk_db_postgres_port,
+        }
+    }
 
 
 # Password validation
